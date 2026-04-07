@@ -1,0 +1,29 @@
+name: Build and publish to docker hub
+on:
+  [workflow_dispatch]
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "Dockerfile"
+  #     - "src/**"
+
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: build .jar file
+        run: |
+          chmod +x ./mvnw
+          ./mvnw clean package
+
+      - name: build image
+        run: docker build -t xdainz/api-pedidos:latest .
+
+      - name: push image to docker hub
+        run: |
+          docker login -u xdainz -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker push xdainz/api-pedidos:latest
