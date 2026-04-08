@@ -1,5 +1,5 @@
-FROM eclipse-temurin:17-jdk-alpine
-VOLUME /tmp
+FROM eclipse-temurin:17-jre
+WORKDIR /app
 COPY target/pedidos.jar app.jar
 EXPOSE 8081
-ENTRYPOINT ["java","-jar","/app.jar"]
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=docker"]

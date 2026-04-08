@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehouseDTO {
-    private Long id;
-    private String name;
-    private BranchDTO inBranch;
+public class OrderProductDTO {
+    private Long productId;
+    private Long quantity;
+    private ProductDTO product;
 }
