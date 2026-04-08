@@ -1,28 +1,60 @@
 package com.smartlogix.pedidos.service;
 
-import com.smartlogix.pedidos.client.InventoryClient;
-import com.smartlogix.pedidos.dto.BranchDTO;
-import com.smartlogix.pedidos.dto.OrderDTO;
-import com.smartlogix.pedidos.dto.OrderItemDTO;
+import com.smartlogix.pedidos.dto.OrderProductDTO;
+import com.smartlogix.pedidos.dto.OrderResponseDTO;
 import com.smartlogix.pedidos.dto.ProductDTO;
 import com.smartlogix.pedidos.model.Order;
-import com.smartlogix.pedidos.model.OrderItem;
+import com.smartlogix.pedidos.model.ProductQuantity;
 import com.smartlogix.pedidos.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
-    private InventoryClient inventoryClient;
+    private RestTemplate restTemplate;
+
+    // call inventory API to get all products based on id list
+    @Value("${inventory.api.base-url}")
+    private String API_URL;
+
+    public List<ProductDTO> getOrderProductsFromAPI(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(API_URL + "/by-id/").queryParam("ids", ids);
+
+        ResponseEntity<List<ProductDTO>> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<ProductDTO>>() {
+
+                });
+
+        return response.getBody() == null ? Collections.emptyList() : response.getBody();
+    }
 
     // ===================== CRUD =====================
 
@@ -30,55 +62,28 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    public List<OrderResponseDTO> findAllWithProducts() {
+        return enrichOrdersWithProducts(orderRepository.findAll());
+    }
+
     public Optional<Order> findById(Long id) {
         return orderRepository.findById(id);
+    }
+
+    public Optional<OrderResponseDTO> findByIdWithProducts(Long id) {
+        return orderRepository.findById(id).map(this::enrichOrderWithProducts);
     }
 
     public List<Order> findByStatus(String status) {
         return orderRepository.findByStatus(status);
     }
 
-    public List<Order> findByBranchId(Long branchId) {
-        return orderRepository.findByBranchId(branchId);
+    public List<OrderResponseDTO> findByStatusWithProducts(String status) {
+        return enrichOrdersWithProducts(orderRepository.findByStatus(status));
     }
 
-    /**
-     * Crea un pedido nuevo.
-     * Consulta la API de inventario para validar que existan el producto y la sucursal,
-     * y obtiene el nombre y SKU del producto para guardarlo localmente.
-     */
-    public Order createOrder(OrderDTO dto) {
-        // Validar que la sucursal existe en el inventario
-        BranchDTO branch = inventoryClient.getBranchById(dto.getBranchId());
-        if (branch == null) {
-            throw new RuntimeException("La sucursal con ID " + dto.getBranchId() + " no existe en el inventario.");
-        }
-
-        // Construir el objeto Order
-        Order order = new Order();
-        order.setCustomerName(dto.getCustomerName());
-        order.setBranchId(dto.getBranchId());
-        order.setStatus("PENDIENTE");
-
-        // Construir los OrderItems consultando el inventario
-        List<OrderItem> items = new ArrayList<>();
-        for (OrderItemDTO itemDTO : dto.getItems()) {
-            ProductDTO product = inventoryClient.getProductById(itemDTO.getProductId());
-            if (product == null) {
-                throw new RuntimeException("El producto con ID " + itemDTO.getProductId() + " no existe en el inventario.");
-            }
-
-            OrderItem item = new OrderItem();
-            item.setProductId(product.getId());
-            item.setProductName(product.getName());
-            item.setProductSku(product.getSku());
-            item.setQuantity(itemDTO.getQuantity());
-            item.setOrder(order);
-            items.add(item);
-        }
-
-        order.setItems(items);
-        return orderRepository.save(order);
+    public Order createOrder(Order o) {
+        return orderRepository.save(o);
     }
 
     /**
@@ -99,19 +104,73 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    // ===================== CONSULTAS AL INVENTARIO =====================
+    private List<OrderResponseDTO> enrichOrdersWithProducts(List<Order> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-    /**
-     * Devuelve todos los productos disponibles en la API de inventario.
-     */
-    public Object getAvailableProducts() {
-        return inventoryClient.getAllProducts();
+        Set<Long> productIds = orders.stream()
+                .filter(order -> order.getProductList() != null)
+                .flatMap(order -> order.getProductList().stream())
+                .map(ProductQuantity::getProductId)
+                .filter(id -> id != null)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        Map<Long, ProductDTO> productMap = buildProductMap(new java.util.ArrayList<>(productIds));
+
+        return orders.stream()
+                .map(order -> mapToOrderResponse(order, productMap))
+                .toList();
     }
 
-    /**
-     * Devuelve todas las sucursales disponibles en la API de inventario.
-     */
-    public Object getAvailableBranches() {
-        return inventoryClient.getAllBranches();
+    private OrderResponseDTO enrichOrderWithProducts(Order order) {
+        if (order == null) {
+            return null;
+        }
+
+        List<Long> productIds = order.getProductList() == null
+                ? Collections.emptyList()
+                : order.getProductList().stream()
+                        .map(ProductQuantity::getProductId)
+                        .filter(id -> id != null)
+                        .distinct()
+                        .toList();
+
+        Map<Long, ProductDTO> productMap = buildProductMap(productIds);
+        return mapToOrderResponse(order, productMap);
     }
+
+    private Map<Long, ProductDTO> buildProductMap(List<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<ProductDTO> products = getOrderProductsFromAPI(productIds);
+        Map<Long, ProductDTO> productMap = new HashMap<>();
+        for (ProductDTO product : products) {
+            if (product != null && product.getId() != null) {
+                productMap.put(product.getId(), product);
+            }
+        }
+        return productMap;
+    }
+
+    private OrderResponseDTO mapToOrderResponse(Order order, Map<Long, ProductDTO> productMap) {
+        List<OrderProductDTO> orderProducts = order.getProductList() == null
+                ? Collections.emptyList()
+                : order.getProductList().stream()
+                        .map(productQuantity -> new OrderProductDTO(
+                                productQuantity.getProductId(),
+                                productQuantity.getQuantity(),
+                                productMap.get(productQuantity.getProductId())))
+                        .toList();
+
+        return new OrderResponseDTO(
+                order.getId(),
+                order.getCustomerName(),
+                order.getStatus(),
+                order.getCreatedAt(),
+                orderProducts);
+    }
+
 }
