@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.smartlogix.pedidos.dto.ProductDTO;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,10 +28,9 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @ElementCollection
+    @CollectionTable(name = "product_quantity", joinColumns = @JoinColumn(name = "id"))
     @Column(nullable = false)
-    private Long branchId;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductDTO> items;
+    private List<ProductQuantity> productList;
 
 }
