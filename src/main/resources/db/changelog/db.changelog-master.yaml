@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-orders
+      author: jenny
+
+      changes:
+        - createTable:
+            tableName: orders
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: customer_name
+                  type: VARCHAR(255)
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: DATETIME
+
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-product-quantity
+      author: jenny
+
+      changes:
+        - createTable:
+            tableName: product_quantity
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: product_id
+                  type: BIGINT
+
+              - column:
+                  name: quantity
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: product_quantity
+            baseColumnNames: id
+            referencedTableName: orders
+            referencedColumnNames: id
+            constraintName: fk_product_quantity_order
+            onDelete: CASCADE
