@@ -61,6 +61,7 @@ jobs:
           -p 8081:8081 \
           -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.EC2_DB_PRIVATE_IP }}:3306/db_pedidos \
           -e SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
+          -e INVENTORY_API_BASE_URL=http://${{ secrets.EC2_API_GATEWAY_PUBLIC_IP }}/api/v1/products \
           --name pedidos \
           --restart unless-stopped \
           ${{ secrets.ECR_REPO_URL_API_PEDIDOS }}:latest \
