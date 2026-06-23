@@ -1,0 +1,173 @@
+databaseChangeLog:
+  - changeSet:
+      id: 04-seed-product-quantities
+      author: smartlogix
+      changes:
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: product_id
+                  valueNumeric: 1
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: product_id
+                  valueNumeric: 3
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: product_id
+                  valueNumeric: 2
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: product_id
+                  valueNumeric: 4
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: product_id
+                  valueNumeric: 9
+              - column:
+                  name: quantity
+                  valueNumeric: 3
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: product_id
+                  valueNumeric: 5
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: product_id
+                  valueNumeric: 1
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: product_id
+                  valueNumeric: 6
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 5
+              - column:
+                  name: product_id
+                  valueNumeric: 7
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: product_id
+                  valueNumeric: 2
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: product_id
+                  valueNumeric: 8
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 7
+              - column:
+                  name: product_id
+                  valueNumeric: 10
+              - column:
+                  name: quantity
+                  valueNumeric: 4
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: product_id
+                  valueNumeric: 3
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+        - insert:
+            tableName: product_quantity
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: product_id
+                  valueNumeric: 5
+              - column:
+                  name: quantity
+                  valueNumeric: 2
