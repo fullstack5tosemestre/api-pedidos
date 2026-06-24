@@ -54,9 +54,10 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          INTERNAL_ALB_DNS: ${{ secrets.INTERNAL_ALB_DNS }}
         run: |
           export LAB_ROLE_ARN="arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role/LabRole"
-          envsubst '$ECR_REPO_URL_API_PEDIDOS $AWS_REGION $RDS_ENDPOINT $MYSQL_ROOT_PASSWORD $LAB_ROLE_ARN' \
+          envsubst '$ECR_REPO_URL_API_PEDIDOS $AWS_REGION $RDS_ENDPOINT $MYSQL_ROOT_PASSWORD $INTERNAL_ALB_DNS $LAB_ROLE_ARN' \
             < aws/taskdef-pedidos.json > taskdef.json
 
       - name: Register task definition
