@@ -1,0 +1,101 @@
+databaseChangeLog:
+  - changeSet:
+      id: 03-seed-orders
+      author: smartlogix
+      changes:
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Juan Pérez"
+              - column:
+                  name: status
+                  value: "ENTREGADO"
+              - column:
+                  name: created_at
+                  value: "2026-06-01 09:15:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "María González"
+              - column:
+                  name: status
+                  value: "EN_PROCESO"
+              - column:
+                  name: created_at
+                  value: "2026-06-05 14:30:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Carlos Ramírez"
+              - column:
+                  name: status
+                  value: "PENDIENTE"
+              - column:
+                  name: created_at
+                  value: "2026-06-10 11:00:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Ana Martínez"
+              - column:
+                  name: status
+                  value: "ENTREGADO"
+              - column:
+                  name: created_at
+                  value: "2026-06-12 16:45:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Luis Torres"
+              - column:
+                  name: status
+                  value: "CANCELADO"
+              - column:
+                  name: created_at
+                  value: "2026-06-15 08:20:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Sofía Herrera"
+              - column:
+                  name: status
+                  value: "EN_PROCESO"
+              - column:
+                  name: created_at
+                  value: "2026-06-18 13:10:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Diego Muñoz"
+              - column:
+                  name: status
+                  value: "PENDIENTE"
+              - column:
+                  name: created_at
+                  value: "2026-06-20 10:30:00"
+        - insert:
+            tableName: orders
+            columns:
+              - column:
+                  name: customer_name
+                  value: "Valentina Castro"
+              - column:
+                  name: status
+                  value: "ENTREGADO"
+              - column:
+                  name: created_at
+                  value: "2026-06-22 15:00:00"
