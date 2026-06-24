@@ -14,7 +14,7 @@
         { "name": "pedidos-8081", "containerPort": 8081, "protocol": "tcp" }
       ],
       "environment": [
-        { "name": "SPRING_DATASOURCE_URL",      "value": "jdbc:mysql://$RDS_ENDPOINT:3306/db_pedidos" },
+        { "name": "SPRING_DATASOURCE_URL",      "value": "jdbc:mysql://$RDS_ENDPOINT:3306/db_pedidos?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true" },
         { "name": "SPRING_DATASOURCE_USERNAME", "value": "admin" },
         { "name": "SPRING_DATASOURCE_PASSWORD", "value": "$MYSQL_ROOT_PASSWORD" },
         { "name": "INVENTORY_API_BASE_URL",     "value": "http://$INTERNAL_ALB_DNS/api/v1/products" }
